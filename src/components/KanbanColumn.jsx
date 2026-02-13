@@ -21,6 +21,13 @@ function KanbanColumn({
         <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600 shadow-sm dark:bg-slate-800 dark:text-slate-300">
           {tasks.length}
         </span>
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={() => onDropTask(column.id)}
+      className="rounded-2xl bg-slate-50 p-4"
+    >
+      <header className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-600">{column.title}</h2>
+        <span className="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">{tasks.length}</span>
       </header>
 
       <div className="space-y-3">
@@ -31,6 +38,11 @@ function KanbanColumn({
               onDelete={onDelete}
               onGenerateSubtasks={onGenerateSubtasks}
               task={task}
+
+              task={task}
+              onDelete={onDelete}
+              onGenerateSubtasks={onGenerateSubtasks}
+              busySubtaskTaskId={busySubtaskTaskId}
             />
           </div>
         ))}
@@ -38,6 +50,9 @@ function KanbanColumn({
         {!tasks.length && (
           <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center text-sm font-semibold text-slate-400 shadow-inner dark:border-slate-700 dark:bg-slate-800/70">
             NEW TASK
+
+          <div className="rounded-lg border border-dashed border-slate-300 p-3 text-center text-xs text-slate-400">
+            Drop tasks here
           </div>
         )}
       </div>

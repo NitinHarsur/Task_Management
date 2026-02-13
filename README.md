@@ -2,6 +2,8 @@
 
 A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhanced with AI-generated task insights and backed by a **MongoDB database** through a lightweight Express API.
 
+A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhanced with AI-generated task insights and subtasks.
+
 ## Features
 
 - Three Kanban lanes: **To Do**, **In Progress**, **Done**
@@ -10,12 +12,16 @@ A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhance
 - Delete tasks
 - Persistent storage in **MongoDB**
 - Light/Dark theme toggle for comfortable viewing
+
+- Persistent local data using `localStorage`
 - AI task enrichment on creation:
   - Suggested priority (**Low / Medium / High**)
   - Suggested completion estimate
   - Suggested category (Development, Research, Testing, etc.)
 - AI subtask generation on demand
 - Responsive, modern UI matching the provided dashboard style with rounded cards and strong soft shadows
+
+- Responsive, modern UI with rounded cards and soft shadows
 - Color-coded priorities
 
 ## Tech Stack
@@ -24,6 +30,10 @@ A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhance
 - Tailwind CSS
 - Express API + MongoDB (`mongodb` Node driver)
 - OpenAI-compatible Chat Completions API
+
+
+- OpenAI-compatible Chat Completions API
+- localStorage for persistence
 
 ## Project Structure
 
@@ -40,6 +50,8 @@ A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhance
 ├── server
 │   ├── db.js
 │   └── index.js
+=======
+├── README.md
 └── src
     ├── App.jsx
     ├── index.css
@@ -51,6 +63,7 @@ A clean, modern Kanban board built with **React + Vite + Tailwind CSS**, enhance
     └── utils
         ├── ai.js
         ├── api.js
+
         ├── constants.js
         └── storage.js
 ```
@@ -64,6 +77,8 @@ npm install
 ```
 
 2. Create a `.env` file in project root (or copy `.env.example`):
+
+2. Create a `.env` file in project root:
 
 ```env
 VITE_OPENAI_API_KEY=your_api_key_here
@@ -85,11 +100,19 @@ npm run server
 
 5. In another terminal, start frontend:
 
+# Optional: if using another provider endpoint
+VITE_OPENAI_BASE_URL=https://api.openai.com/v1/chat/completions
+```
+
+3. Start development server:
+
 ```bash
 npm run dev
 ```
 
 6. Build for production:
+
+4. Build for production:
 
 ```bash
 npm run build
@@ -106,6 +129,15 @@ npm run build
 
 - Backend connects using `MONGODB_URI` and stores tasks in `MONGODB_DB_NAME`.
 - Task IDs are app-generated UUIDs, and MongoDB also maintains its internal `_id` per document.
+
+
+- For production, route API calls through a backend proxy to avoid exposing keys in browser code.
+
+## AI Integration Notes
+
+- AI metadata and subtasks are requested in `src/utils/ai.js`.
+- Prompt responses are expected as strict JSON for simple parsing.
+- Fallback values are used if the AI request fails.
 
 ## License
 
