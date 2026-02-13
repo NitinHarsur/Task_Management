@@ -6,6 +6,9 @@ import { COLUMNS } from './utils/constants'
 import { taskApi } from './utils/api'
 
 const createTaskPayload = ({ title, description, suggestions }) => ({
+import { loadTasks, saveTasks } from './utils/storage'
+
+const createTask = ({ title, description, suggestions }) => ({
   id: crypto.randomUUID(),
   title,
   description,
@@ -19,6 +22,11 @@ const createTaskPayload = ({ title, description, suggestions }) => ({
 
 function App() {
   const [tasks, setTasks] = useState([])
+
+})
+
+function App() {
+  const [tasks, setTasks] = useState(() => loadTasks())
   const [draggedTaskId, setDraggedTaskId] = useState(null)
   const [loadingTask, setLoadingTask] = useState(false)
   const [busySubtaskTaskId, setBusySubtaskTaskId] = useState(null)
@@ -36,6 +44,8 @@ function App() {
 
     loadTasks()
   }, [])
+    saveTasks(tasks)
+  }, [tasks])
 
   const tasksByColumn = useMemo(
     () =>
@@ -57,6 +67,11 @@ function App() {
       setTasks((previous) => [created, ...previous])
     } catch {
       setError('Task creation failed. Check AI/API server configuration and try again.')
+
+      setTasks((previous) => [createTask({ ...taskInput, suggestions }), ...previous])
+    } catch (aiError) {
+      setError('AI insights unavailable. Task created with default values.')
+      setTasks((previous) => [createTask({ ...taskInput, suggestions: {} }), ...previous])
     } finally {
       setLoadingTask(false)
     }
@@ -86,6 +101,18 @@ function App() {
     } catch {
       setError('Failed to delete task from database.')
     }
+
+  const moveTask = (toStatus) => {
+    if (!draggedTaskId) return
+
+    setTasks((previous) =>
+      previous.map((task) => (task.id === draggedTaskId ? { ...task, status: toStatus } : task)),
+    )
+    setDraggedTaskId(null)
+  }
+
+  const deleteTask = (taskId) => {
+    setTasks((previous) => previous.filter((task) => task.id !== taskId))
   }
 
   const handleGenerateSubtasks = async (taskId) => {
@@ -101,6 +128,12 @@ function App() {
       setTasks((previous) => previous.map((task) => (task.id === taskId ? updated : task)))
     } catch {
       setError('Failed to generate/save subtasks. Please check your AI key and API server.')
+
+      setTasks((previous) =>
+        previous.map((task) => (task.id === taskId ? { ...task, subtasks } : task)),
+      )
+    } catch {
+      setError('Failed to generate subtasks. Please check your API key and try again.')
     } finally {
       setBusySubtaskTaskId(null)
     }
@@ -112,6 +145,8 @@ function App() {
         <header className="mb-6">
           <h1 className="text-3xl font-bold text-slate-900">AI-Powered Kanban Board</h1>
           <p className="mt-1 text-slate-600">Now backed by SQLite for durable task storage.</p>
+
+          <p className="mt-1 text-slate-600">Manage work with drag-and-drop and instant AI suggestions.</p>
         </header>
 
         <div className="mb-6 grid gap-6 lg:grid-cols-[360px,1fr]">
@@ -122,6 +157,12 @@ function App() {
               <li>Auto-generates priority, category, and estimated time at task creation.</li>
               <li>Breaks large tasks into smaller subtasks with one click.</li>
               <li>Stores task state in SQLite via a lightweight API server.</li>
+
+            <h2 className="text-lg font-semibold text-slate-800">How AI helps</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+              <li>Auto-generates priority, category, and estimated time at task creation.</li>
+              <li>Breaks large tasks into smaller subtasks with one click.</li>
+              <li>All task data persists locally in your browser.</li>
             </ul>
             {error && <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">{error}</p>}
           </div>
